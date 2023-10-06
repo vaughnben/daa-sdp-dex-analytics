@@ -503,16 +503,16 @@ jQuery(document).ready(function ($) {
       return sessionStorage.getItem("lastCheckoutEventViewed-" + cartId);
     }
 
-    function _trackCheckoutStepViewed(cartId, step, checkoutEventName) {
+    function _trackCheckoutStepViewed(cartId, step) {
       var lastStep = _getLastCheckoutStepViewed(cartId);
       var lastCheckoutEvent = _getLastCheckoutEventViewed(cartId);
 
       if (lastStep && lastStep < step) {
-        _trackCheckoutStepCompleted(cartId, lastStep, lastCheckoutEvent);
+        _trackCheckoutStepCompleted(cartId, lastStep);
       }
 
       var checkout = _getCheckoutStep(cartId, step);
-      var eventName = checkoutEventName + " Viewed";
+      var eventName = "Checkout Step Viewed";
 
       console.debug("DexSegmentAnalytics: Recording " + eventName);
       console.debug("DexSegmentAnalytics: Checkout [%o]", checkout);
@@ -522,11 +522,11 @@ jQuery(document).ready(function ($) {
       _setLastCheckoutEventViewed(cartId, checkoutEventName);
     }
 
-    function _trackCheckoutStepCompleted(cartId, step, checkoutEventName) {
+    function _trackCheckoutStepCompleted(cartId, step) {
       var checkout = _getCheckoutStep(cartId, step);
-      var eventName = checkoutEventName + " Completed";
+      var eventName = "Checkout Step Completed";
       console.debug(
-        "DexSegmentAnalytics: Recording " + eventName + " Completed"
+        "DexSegmentAnalytics: Recording " + eventName + " Step " + step
       );
       console.debug("DexSegmentAnalytics: Checkout [%o]", checkout);
       window.analytics.track(eventName, checkout);
@@ -650,7 +650,7 @@ jQuery(document).ready(function ($) {
       CCRZ.pubSub.on("view:AddressListing:refresh", function (viewInstance) {
         var cartId = CCRZ.cartCheckoutModel.attributes.encryptedId;
 
-        _trackCheckoutStepViewed(cartId, 1, "Checkout Step 1 (Account Info)");
+        _trackCheckoutStepViewed(cartId, 1);
       });
 
       console.debug(
@@ -659,7 +659,7 @@ jQuery(document).ready(function ($) {
       CCRZ.pubSub.on("view:ShippingView:refresh", function (viewInstance) {
         var cartId = CCRZ.cartCheckoutModel.attributes.encryptedId;
 
-        _trackCheckoutStepViewed(cartId, 1.5, "Checkout Step 1.5 (Order Info)");
+        _trackCheckoutStepViewed(cartId, 1.5);
       });
 
       console.debug(
@@ -668,7 +668,7 @@ jQuery(document).ready(function ($) {
       CCRZ.pubSub.on("view:OrderReviewView:refresh", function (viewInstance) {
         var cartId = CCRZ.cartCheckoutModel.attributes.encryptedId;
 
-        _trackCheckoutStepViewed(cartId, 2, "Checkout Step 2 (Order Review)");
+        _trackCheckoutStepViewed(cartId, 2);
       });
 
       console.debug(
@@ -677,11 +677,7 @@ jQuery(document).ready(function ($) {
       CCRZ.pubSub.on("view:PaymentView:refresh", function (viewInstance) {
         var cartId = CCRZ.cartCheckoutModel.attributes.encryptedId;
 
-        _trackCheckoutStepViewed(
-          cartId,
-          3,
-          "Checkout Step 3 (Payment Submission)"
-        );
+        _trackCheckoutStepViewed(cartId, 3);
       });
 
       console.debug(
@@ -692,8 +688,8 @@ jQuery(document).ready(function ($) {
         var paymentMethod =
           CCRZ.orderDetailModel.attributes.eCommCheckoutFlowOpted;
 
-        _trackCheckoutStepViewed(cartId, 4, "Checkout Complete (Thank you)");
-        _trackCheckoutStepCompleted(cartId, 4, "Checkout");
+        _trackCheckoutStepViewed(cartId, 4);
+        _trackCheckoutStepCompleted(cartId, 4);
         _trackOrderCompleted();
       });
     };
