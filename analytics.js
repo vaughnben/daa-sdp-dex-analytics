@@ -239,6 +239,7 @@ jQuery(document).ready(function ($) {
         .find("button.cc_add_item,button.cc_add_to_cart")
         .click(function () {
           product.quantity = parseInt(productDetailJQ.find("#qty").val()) || 1;
+
           if (product.sku == null) {
             var selectedVariant = $(productDetailJQ).find(
               "#subscriptionDropdown button.selected"
@@ -251,7 +252,8 @@ jQuery(document).ready(function ($) {
               product.label = product.name;
             }
           }
-
+          var cartId = CCRZ.pagevars.currentCartID;
+          product.cart_id = cartId;
           console.debug("DexSegmentAnalytics: Recording Product Added");
           console.debug("DexSegmentAnalytics: Product [%o]", product);
           window.analytics.track("Product Added", product);
